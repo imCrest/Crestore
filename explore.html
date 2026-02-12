@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crestore — Exclusive Collection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --card-bg: #0a0a0a;
+            --gold-1: #fde68a;
+            --gold-2: #facc15;
+            --gold-3: #d4af37;
+            --gold-4: #b8860b;
+            --text-main: #e5e5e5;
+            --text-dim: rgba(255, 255, 255, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Reuse starfield for consistency */
+        .space {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(1200px_800px at 80% 20%, rgba(255, 215, 0, .04), transparent 60%),
+                radial-gradient(1000px_700px at 20% 80%, rgba(212, 175, 55, .03), transparent 60%),
+                #000;
+            z-index: 0;
+        }
+
+        .stars {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(1.5px 1.5px at 20% 30%, rgba(255, 255, 255, .4) 50%, transparent 51%),
+                radial-gradient(1px 1px at 70% 80%, rgba(255, 255, 255, .3) 50%, transparent 51%),
+                radial-gradient(1px 1px at 40% 60%, rgba(255, 255, 255, .3) 50%, transparent 51%);
+            opacity: 0.4;
+        }
+
+        /* Header */
+        header {
+            padding: 30px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            animation: slideDown 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 24px;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .brand:hover {
+            opacity: 0.8;
+        }
+
+        nav a {
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color 0.3s, text-shadow 0.3s;
+            position: relative;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--gold-2);
+            text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gold-2);
+            box-shadow: 0 0 8px var(--gold-2);
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 5% 120px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text {
+            text-align: center;
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            font-style: italic;
+            font-size: clamp(3rem, 6vw, 5rem);
+            margin: 0;
+            line-height: 1.1;
+            background: linear-gradient(to bottom, #fff 20%, #888);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--gold-3);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 40px;
+        }
+
+        /* Product Card */
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            aspect-ratio: 3/4;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+        }
+
+        /* Staggered animation delay handled by JS */
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
+            border-color: rgba(212, 175, 55, 0.3);
+            z-index: 2;
+        }
+
+        .card-img {
+            flex-grow: 1;
+            background: radial-gradient(circle at center, rgba(30, 30, 30, 0.8), #050505);
+            display: grid;
+            place-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Abstract shapes for product placeholders */
+        .shape {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.8s ease;
+        }
+
+        .card:hover .shape {
+            transform: scale(1.1) rotate(5deg);
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.1);
+        }
+
+        /* Different shapes for variety */
+        .shape.circle {
+            border-radius: 50%;
+        }
+
+        .shape.square {
+            transform: rotate(45deg);
+        }
+
+        .shape.rect {
+            width: 100px;
+            height: 140px;
+        }
+
+        .card-content {
+            padding: 24px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            transform: translateY(10px);
+            opacity: 0.9;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .card:hover .card-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .card-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            margin: 0 0 4px;
+            font-weight: 500;
+            color: #fff;
+            letter-spacing: 0.05em;
+        }
+
+        .card-category {
+            font-size: 0.75rem;
+            color: var(--gold-3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .price {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            color: var(--text-main);
+            font-size: 1.1rem;
+        }
+
+        .action-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .card:hover .action-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .action-btn:hover {
+            background: var(--gold-2);
+            color: #000;
+            border-color: var(--gold-2);
+        }
+
+        /* Keyframes */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold-4);
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="space">
+        <div class="stars"></div>
+    </div>
+
+    <header>
+        <a href="index.html" class="brand">Crestore</a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="#" class="active">Shop</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="hero-text">
+            <span class="subtitle">The 2025 Collection</span>
+            <h1>Timeless<br>Elegance</h1>
+        </div>
+
+        <div class="grid" id="product-grid"></div>
+    </main>
+
+    <script>
+        const products = [
+            { id: 1, name: "Obsidian Jacket", category: "Outerwear", price: "$249", shape: "rect" },
+            { id: 2, name: "Silk Midnight Shirt", category: "Shirts", price: "$129", shape: "square" },
+            { id: 3, name: "Aurum Timepiece", category: "Accessories", price: "$899", shape: "circle" },
+            { id: 4, name: "Velvet Loafers", category: "Footwear", price: "$189", shape: "rect" },
+            { id: 5, name: "Marble Signet", category: "Jewelry", price: "$149", shape: "circle" },
+            { id: 6, name: "Cashmere Scarf", category: "Accessories", price: "$99", shape: "square" }
+        ];
+
+        const grid = document.getElementById('product-grid');
+
+        products.forEach((p, i) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            // Staggered animation delay
+            card.style.animation = `fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) ${0.5 + (i * 0.1)}s forwards`;
+
+            card.innerHTML = `
+        <button class="action-btn" title="View Details">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <div class="card-img">
+          <div class="shape ${p.shape}"></div>
+        </div>
+        <div class="card-content">
+          <div class="card-meta">
+            <div>
+              <div class="card-category">${p.category}</div>
+              <h3 class="card-title">${p.name}</h3>
+            </div>
+            <span class="price">${p.price}</span>
+          </div>
+        </div>
+      `;
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+
+</html>
